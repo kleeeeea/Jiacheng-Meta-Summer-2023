@@ -1,0 +1,26 @@
+\section{Model-Based Metric Learning}
+In this section, we describe how to train a model-based metric for both faithfulness and factuality.
+
+\subsection{Input Prompting}
+Previous model-based metrics for faithfulness~\cite{Gekhman2023TrueTeacherLF} and factuality~\cite{Azaria2023TheIS} usually model this task as a binary classification. Basically, for faithfulness, previous work~\cite{Gekhman2023TrueTeacherLF} concatenate \textit{grounding text} and \textit{generated text} into one text and feed it into a language model; for factuality, they send only \textit{generated text} to the model. Then, a standard binary text classification will be applied to finetune the model to get the model-based metric.
+
+Different from previous models, our metric is designed for both of faithfulness and factuality evaluation. Hence, we use two kinds of prompt templates for faithfulness and factuality respectively. Specifically, for faithfulness, given the grounding text $T_{\mathrm{ground}}$ and the generated text $T_{\mathrm{gen}}$, we use the following prompt as the model input:
+
+\textit{Input Text: }$T_{\mathrm{ground}}$ \\
+\textit{Generated Text: } $T_{\mathrm{gen}}$
+
+When faithfulness prompt template is used, our model-based metric will evaluate the consistency between $T_{\mathrm{ground}}$ and $T_{\mathrm{gen}}$. Similarly, for factuality, we have only the generated text $T_{\mathrm{gen}}$ and apply the following prompt as the model input:
+
+\textit{Generated Text: } $T_{\mathrm{gen}}$
+
+In this case, we expect our learned model-based metric can evaluate the consistency between the generated text and the common-sense or facts in the world.
+
+\subsection{Model Training}
+Because faithfulness is to evaluate the consistency between the grounding text and the generated text, previous methods~\cite{Gekhman2023TrueTeacherLF} fully finetune all parameters to obtain the best performance. Different from faithfulness, factuality requires that the model to evaluate the consistency between the generation and facts. Hence, we need to acquire knowledge from pre-trained parameters of language models. However, all-parameter finetuning will make the pre-trained model forget the prior knowledge from pre-training and overfit on the finetuning dataset. SAPLMA~\cite{Azaria2023TheIS} probes language models to get features for a classifier from internal hidden states. Probing is effective for factuality evaluation but it still has sub-optimal performance on faithfulness evaluation because only finetuning a multilayer perceptron limits the model capacity.
+
+To balance the model capacity for faithfulness and prior knowledge for factuality, in this paper, we propose to employ Low-Rank Adaptation (LoRA)~\cite{Hu2021LoRALA} for model-based metric finetuning. We claim that there are two advantages of LoRA for faithfulness and factuality evaluation:
+(1) LoRA finetuning has comparable performance as all-parameter finetuning~\cite{Hu2021LoRALA};
+(2) LoRA finetunes only low rank metrics and keep pre-trained parameters unchanged which preserves the prior knowledge about common-sense and facts for factuality evaluation.
+
+
+

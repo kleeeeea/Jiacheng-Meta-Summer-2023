@@ -1,0 +1,59 @@
+\section{Experiment}
+\subsection{Datasets}
+In this section, we will introduce the training data construction and the test data used for evaluation. 
+
+\textbf{Training data}
+In our paper, for \emph{faithfulness}, we use datasets of summarization, paraphrase and OpenQA tasks as our training data. Generally, we follow TrueTeacher~\cite{Gekhman2023TrueTeacherLF} and use synthetic data from model generation as our training corpus. Specifically, for summarization, we re-use the generated text from TrueTeacher~\cite{Gekhman2023TrueTeacherLF}; for paraphrase, we train T5~\cite{Raffel2019ExploringTL} models with different sizes (i.e.,~small, base and large) on a combined dataset including Quora Question Pairs~\cite{quora-question-pairs} and ChatGPT Paraphrases~\cite{chatgpt_paraphrases_dataset}; for OpenQA, we use Flan-T5~\cite{Chung2022ScalingIL} with different sizes (i.e.,~small, base and large) to make inference on SQUAD-v2~\cite{squad} dataset. \todo{Further details about data generation in Appendix}. After obtaining these generations, we apply the method introduced in~\Cref{sec:llm_faithful} to annotate the data with label 0 or 1. After pre-processing, the statistics of training data can be found in~\Cref{tab:train_data_stat}. 
+%For fair comparison, we randomly sample 100,000 data instances in each domain respectively for model training.
+
+For \emph{factuality}, we 
+
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{ccc}
+\toprule
+\textbf{Summarization} & \textbf{Paraphrasing} & \textbf{OpenQA}  \\ \midrule
+500,000       & 296,800      & 156,762 \\ \bottomrule
+\end{tabular}
+\caption{Number of data instances in our synthetic training data.}
+\label{tab:train_data_stat}
+\end{table}
+
+
+\textbf{Test data}
+For test data, we use full data introduced in~\Cref{sec:benchmark} to test the faithfulness and factuality evaluation performance of different metrics.
+
+\subsection{Baselines}
+For faithfulness evaluation, we include three kinds of methods as our baselines:
+
+(1)~\textbf{N-gram metrics} are shown to have weak correlation with faithfulness evaluation~\cite{maynez-etal-2020-faithfulness, honovich-etal-2021-q2}. Hence, we include BLEU~\cite{bleu}, Meteor~\cite{banerjee-lavie-2005-meteor} and ROUGEL~\cite{rouge}.
+
+(2)~\textbf{General model-based metrics}
+\begin{itemize}[nosep,leftmargin=*]
+    \item \textbf{BERTScore}~\cite{Zhang2019BERTScoreET} aggregates token-level similarity scores between the BERT~\cite{Devlin2019BERTPO} contextual embeddings in candidate and reference text. Follow TRUE~\cite{Honovich2022TRUERF}, we use BERTScore with the DeBERTa-xl-MNLI model~\cite{He2020DeBERTaDB, nangia-etal-2017-repeval}.
+    \item \textbf{BARTScore}~\cite{Yuan2021BARTScoreEG} evaluates text using probabilities of decoding from a BART model~\cite{lewis-etal-2020-bart}. We use the version finetuned on the ParaBank2 dataset~\cite{hu-etal-2019-large}.
+    \item \textbf{BLEURT}~\cite{sellam-etal-2020-bleurt} is a model-based metric based on BERT for evaluating text generation. BLEURT is further pre-trained on synthetic data and then finetuned on human annotations to train a model that scores system outputs. We use the BLEURT-20 checkpoint~\cite{pu-etal-2021-learning} following TRUE.
+\end{itemize}
+
+(3)~\textbf{Model-based metrics for faithfulness}
+\begin{itemize}[nosep,leftmargin=*]
+    \item \textbf{FactCC}~\cite{kryscinski-etal-2020-evaluating} uses documents from CNN/DM as premise and the positive hypotheses are randomly sampled sentences from the premise. Some hypotheses are paraphrased by back-translation and injected with noise including duplicating or removing random tokens. For negative hypotheses, authors use rule-based methods, such as sentence negation and entity/pronoun/number swaps.
+    \item \textbf{Falsesum}~\cite{Utama2022FalsesumGD} uses documents and summaries from CNN/DM as positive examples. To obtain negative examples, authors use the OpenIE to extract predicates and arguments in the document and corresponding summary. Predicates and arguments from the gold summary are randomly selected to be masked and infilled by predicates and arguments from document or by predictions from a infilling model.
+    \item \textbf{TrueTeacher}~\cite{Gekhman2023TrueTeacherLF} generates synthetic data by training different T5 models on CNN/DM and generate summaries. To obtain supervision, they employ FLAN-PaLM 540B~\cite{Chung2022ScalingIL} to generate ``Yes'' or ``No'' to indicate if the generated text is faithful to the input doc.
+\end{itemize}
+
+For factuality evaluation, we compare our method
+
+\subsection{Implementation Details}
+
+\subsection{Overall Performance on Faithfulness}
+
+\subsection{Overall Performance on Factuality}
+
+\subsection{Fully Finetuning vs. LoRA vs. Probing}
+
+\subsection{Multi-domain Training}
+
+% combined vs. sum vs. paraphrase vs. qa

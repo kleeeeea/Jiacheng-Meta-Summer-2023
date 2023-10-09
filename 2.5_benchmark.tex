@@ -1,0 +1,76 @@
+\section{Task Definition and Benchmark}
+\subsection{Task Definition}
+In this paper, we aim to evaluate faithfulness and factuality using one model-based metric trained on annotations from large language models. Given generated text from models, we define \textit{faithfulness} and \textit{factuality} as follows:
+
+\textbf{Faitfhulness}: given a grounding text, \textit{faithfulness} evaluates if the generated text is consistent with the corresponding grounding text.
+
+\textbf{Factuality}: without grounding text, \textit{factuality} evaluates if the generated text is consistent with common sense and facts in world knowledge.
+
+As shown in \todo{Fig}, when both grounding text and generated text are given, our metric will evaluate \textit{faithfulness}; when only generated text is given, our metric will evaluate \textit{factuality}. For each data instance, the metric outputs a score which will range from 0 to 1 and 0 represents the generated text containing hallucination; 1 represents the generated text is faithful to inputs or consistent to common sense.
+
+
+\subsection{Benchmark}
+\label{sec:benchmark}
+In this section, we introduce datasets used for \textit{faithfulness} and \textit{factuality} evaluation.
+\subsubsection{Faithfulness}
+\label{sec:bench_faithfulness}
+We include 13 datasets that contain human annotations w.r.t faithfulness in diverse NLP tasks including summarization, paraphrasing, fact-checking, dialogue and open QA. The numbers for these datasets are shown in~\Cref{tab:faithfulness_data}. For HaluEval datasets (i.e.,~HaluEval-sum, HaluEval-dial and HaluEval-QA), we directly use the annotations from datasets. But for other datasets, to obtain the faithfulness annotations, we follow previous work~\cite{Honovich2022TRUERF} to preprocess datasets. Then, in all processed datasets, each data instance has one \textit{Grounding Text}, one \textit{Generated Text} and a corresponding label. If the \textit{Generated Text} is faithful to the \textit{Grounding Text}, then the label will be 1, otherwise, the label is 0. Detailed dataset introduction can be found in~\todo{Appendix}.
+
+\begin{table}[t]
+\small
+\centering
+\scalebox{0.95}{
+\setlength{\tabcolsep}{1mm}{
+\begin{tabular}{lrr}
+\toprule
+\multicolumn{1}{c}{\textbf{Dataset}} & \multicolumn{1}{c}{\textbf{\# Examples}} & \multicolumn{1}{c}{\textbf{\# Positives}} \\ \midrule
+\multicolumn{3}{c}{\textbf{Summarization}} \\ \midrule                                   
+Frank~\cite{pagnoni-etal-2021-understanding}                                & 671                                      & 33.2\%                                     \\
+Summeval~\cite{Fabbri2020SummEvalRS}                             & 1,600                                    & 81.6\%                                     \\
+MNBM~\cite{maynez-etal-2020-faithfulness}                                 & 2,500                                    & 10.2\%                                     \\
+QAGS~\cite{wang-etal-2020-asking}                                 & 239                                      & 48.5\%                                     \\
+HaluEval-sum~\cite{Li2023HaluEvalAL}                         & 20,000                                   & 50.0\%                                     \\ \midrule
+\multicolumn{3}{c}{\textbf{Dialogue}}        \\ \midrule                                 
+BEGIN~\cite{Dziri2021EvaluatingAI}                                & 836                                      & 33.7\%                                     \\
+Q$^2$~\cite{honovich-etal-2021-q2}                                   & 1,088                                    & 57.7\%                                     \\
+DialFact~\cite{Gupta2021DialFactAB}                             & 8,689                                    & 38.5\%                                     \\
+HaluEval-dial~\cite{Li2023HaluEvalAL}                        & 20,000                                   & 50.0\%                                     \\ \midrule
+\multicolumn{3}{c}{\textbf{Fact Check}}                                                                                      \\ \midrule   
+Fever~\cite{thorne-etal-2018-fact}                                & 18,209                                   & 35.1\%                                     \\
+VitaminC~\cite{schuster-etal-2021-get}                             & 63,054                                   & 49.9\%                                     \\ \midrule
+\multicolumn{3}{c}{\textbf{Paraphrasing}}                                                                                    \\ \midrule   
+PAWS~\cite{zhang-etal-2019-paws}                                 & 8,000                                    & 44.2\%                                     \\ \midrule
+\multicolumn{3}{c}{\textbf{QA}}                                                                                              \\ \midrule   
+HaluEval-QA~\cite{Li2023HaluEvalAL}                          & 20,000                                   & 50.0\%                                     \\ \bottomrule
+\end{tabular}
+}}
+\caption{Dataset statistics for faithfulness.}
+\label{tab:faithfulness_data}
+\end{table}
+
+\subsubsection{Factuality}
+\begin{table}[t]
+\small
+\centering
+\scalebox{0.87}{
+\setlength{\tabcolsep}{1mm}{
+\begin{tabular}{lrr}
+\toprule
+\multicolumn{1}{c}{\textbf{Dataset}} & \multicolumn{1}{c}{\textbf{\# Examples}} & \multicolumn{1}{c}{\textbf{\# Positives}} \\ \midrule
+\textbf{Wiki bio}~\cite{manakul2023selfcheckgpt}                    & 476                                      & 52.5\%                                     \\ \midrule
+\textbf{Halu-general}~\cite{Li2023HaluEvalAL}                & 5,000                                    & 80.5\%                                     \\ \midrule
+\textbf{TrueFalse}~\cite{Azaria2023TheIS}                   &                                          &                                            \\
+- Animals                             & 1,008                                    & 50.0\%                                     \\
+- Capitals                           & 1,458                                    & 50.0\%                                     \\
+- Cities                             & 10,000                                   & 51.6\%                                     \\
+- Companies                          & 2,850                                    & 45.4\%                                     \\
+- Elements                           & 930                                      & 50.0\%                                     \\
+- Facts                              & 2,295                                    & 44.2\%                                     \\
+- Inventions                         & 876                                      & 53.0\%                                     \\ \bottomrule
+\end{tabular}
+}}
+\caption{Dataset statistics for factuality.}
+\label{tab:factuality_data}
+\end{table}
+
+We include three kinds of factuality datasets in this paper: (1)~\textbf{Wiki bio} contains 476 instances which are Wikipedia-like passages generated from GPT-3~\footnote{text-davinci-003} using the prompts. Authors manually annotate sentence-level factuality. In our experiments, only when all sentences are factual we consider a passage factual (the label is 1)~\footnote{We consider all original wiki bio passages (from Wikipedia instead of model generation) as factual text.}. (2)~\textbf{Halu-general} contains 5,000 human-annotated samples for ChatGPT responses to general user queries from Alpaca~\cite{alpaca}. (3)~\textbf{TrueFalse} contains 7 categories of short-sentence statements about facts in the world. For each statement, we have a label 0 or 1 for factuality.
